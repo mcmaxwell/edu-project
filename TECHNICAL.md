@@ -478,19 +478,27 @@ Step-by-step build order. Each step is a single, mergeable slice — finish and 
 - [x] Scripts: `db:generate`, `db:push`, `db:migrate` (schema + RLS), `db:apply-rls`, `db:setup-app-role`, `db:studio`, `db:verify`.
 - **Verified:** Neon project provisioned; `pnpm db:migrate` applied; `pnpm db:setup-app-role` created the `inkprint_app` role; `pnpm db:verify` returns `ok: true` proving: Alice sees only her class, Bob sees only his, anon sees nothing, and Alice cannot insert a class assigned to Bob (`WITH CHECK` rejection).
 
-### Step 7 — Auth & registration
-- [ ] Lucia v3 wired with Postgres adapter.
-- [ ] `POST /api/auth/signup` (email + password, Argon2id, HIBP check).
-- [ ] `POST /api/auth/login`, `POST /api/auth/logout`.
-- [ ] Verification email via Resend.
-- [ ] `GET /api/auth/verify`, reset-password flow.
-- [ ] Middleware that gates `/app/*` and `/admin/*` by role.
-- **Done when:** a new user can sign up, verify, log in, log out, and see the empty dashboard.
+### Step 7 — Auth & registration — ✅ DONE
+- [x] **Decision:** rolled our own session layer with `@node-rs/argon2` + SHA-256 token hashes instead of Lucia v3 — Lucia was deprecated in 2025 and the author now recommends DIY using `@oslojs/*`. Our model: random 256-bit token in HttpOnly cookie, SHA-256 hash stored as `sessions.token_hash` (primary key), 14-day rolling expiry.
+- [x] Schema additions: `sessions` (token_hash PK, user_id, expires_at) and `verification_tokens` (id, user_id, token_hash, type, expires_at, consumed_at). Migration `0001_easy_king_bedlam.sql` applied.
+- [x] `POST /api/auth/signup` — email + password (≥12), Argon2id hash, HIBP k-anonymity check (fail-open on network errors), unique email check, session created on success.
+- [x] `POST /api/auth/login`, `POST /api/auth/logout`.
+- [x] Verification email via Resend (with dev-mode console fallback so test addresses still work locally).
+- [x] `GET /api/auth/verify?token=...` consumes the token and transitions `users.status` from `pending` → `active`.
+- [x] Middleware at `apps/web/middleware.ts` fast-path-gates `/app/*` and `/admin/*` by cookie presence; the gated page's server component then runs the full session lookup via `requireSession()` / `requireAdmin()`.
+- [x] UI: `(auth)` route group with `/signup`, `/login`, `/verify` (status page); gated `/app` dashboard showing email-verified + account-status + role badges and a logout form.
+- [x] Zod validation at every route boundary.
+- [ ] **Deferred:** password reset flow and Google/Microsoft SSO — added when they're actually needed (institution plan).
+- **Verified:** end-to-end smoke test against Neon: gate redirects unauthenticated users → signup → `/app` shows "Unverified / pending" → verify URL consumed → `/app` shows "Verified / active" → logout redirects → wrong password rejected → correct login restores access.
 
-### Step 8 — Onboarding wizard
-- [ ] 3 steps from `TECHNICAL.md §4.1`: role pick → API key (skippable) → first class.
-- [ ] State persisted server-side, resumable.
-- **Done when:** the first-login flow drops the user at the dashboard with at least one class created.
+### Step 8 — Onboarding wizard — ✅ DONE
+- [x] Schema: `onboarding_step` enum (`role`, `api_key`, `class`, `complete`) + `onboarding_intent text` columns on `users`. Migration `0002_brainy_steve_rogers.sql` applied.
+- [x] `/onboarding` page server-renders the current step based on `user.onboardingStep`; revisiting after completion redirects to `/app`.
+- [x] Step 1 — Role: "I'm a teacher" / "I'm evaluating for an institution." Intent stored on `users.onboarding_intent`.
+- [x] Step 2 — API key: "Skip for now" only in this step. Full add-key UI lands with BYOK (Step 9), button is rendered as disabled with a Step-9 marker.
+- [x] Step 3 — First class: name input. Insert goes through `withUserScope(userId, ...)` — a new helper in `server/db.ts` that wraps a Drizzle transaction with `set_config('app.user_id', ...)` so RLS lets the WITH CHECK pass.
+- [x] Middleware updated to gate `/onboarding`; `/app` layout redirects to `/onboarding` if `onboardingStep !== 'complete'`.
+- **Verified:** end-to-end against Neon: new user signs up → bounced to `/onboarding` → picks role → skips key → creates a class → lands on `/app` dashboard. State is resumable (refreshing mid-flow re-renders the correct step). RLS engaged on the class insert.
 
 ### Step 9 — BYOK (own API key)
 - [ ] KMS master key provisioned (AWS KMS via Vercel OIDC).

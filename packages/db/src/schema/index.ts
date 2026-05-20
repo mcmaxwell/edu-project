@@ -1,5 +1,6 @@
 export * from './enums'
 export * from './users'
+export * from './auth'
 export * from './api-keys'
 export * from './access-grants'
 export * from './audit'

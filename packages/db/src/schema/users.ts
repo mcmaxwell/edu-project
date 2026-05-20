@@ -1,5 +1,5 @@
 import { pgTable, uuid, text, timestamp, index, uniqueIndex } from 'drizzle-orm/pg-core'
-import { userRole, userStatus, plan, dataRegion } from './enums'
+import { userRole, userStatus, plan, dataRegion, onboardingStep } from './enums'
 
 export const institutions = pgTable('institutions', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -20,6 +20,8 @@ export const users = pgTable(
     institutionId: uuid('institution_id').references(() => institutions.id, {
       onDelete: 'set null',
     }),
+    onboardingStep: onboardingStep('onboarding_step').notNull().default('role'),
+    onboardingIntent: text('onboarding_intent'),
     emailVerifiedAt: timestamp('email_verified_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },

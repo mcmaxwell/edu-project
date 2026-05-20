@@ -8,6 +8,20 @@
       "when": 1779290828479,
       "tag": "0000_romantic_kingpin",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1779292159767,
+      "tag": "0001_easy_king_bedlam",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779292665910,
+      "tag": "0002_brainy_steve_rogers",
+      "breakpoints": true
     }
   ]
 }

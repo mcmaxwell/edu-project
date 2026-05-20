@@ -7,6 +7,12 @@ export const dataRegion = pgEnum('data_region', ['us', 'eu'])
 export const provider = pgEnum('provider', ['openai', 'anthropic', 'gemini', 'azure_openai'])
 export const grantProvider = pgEnum('grant_provider', ['openai', 'anthropic', 'gemini'])
 export const confidence = pgEnum('confidence', ['low', 'medium', 'high', 'inconclusive'])
+export const onboardingStep = pgEnum('onboarding_step', [
+  'role',
+  'api_key',
+  'class',
+  'complete',
+])
 export const verdict = pgEnum('verdict', [
   'aligned',
   'partial_concern',

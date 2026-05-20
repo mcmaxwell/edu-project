@@ -1,16 +1,16 @@
 -- Inkprint — Row-Level Security policies
 --
--- The app sets `app.user_id` per request via `SET LOCAL app.user_id = '<uuid>'`.
+-- The app sets `app.user_id` per request via `set_config('app.user_id', '<uuid>', true)`.
 -- Policies derive teacher ownership from that setting.
--- Admin paths use SECURITY DEFINER functions (added per-feature), not RLS bypass.
+-- Admin paths use the owner role (DATABASE_URL) which has BYPASSRLS on Neon.
+-- Regular app traffic uses the `inkprint_app` role (APP_DATABASE_URL) which does not.
+--
+-- This file is idempotent — safe to re-apply after schema migrations.
 
 create or replace function current_user_id() returns uuid
   language sql stable as $$
     select nullif(current_setting('app.user_id', true), '')::uuid
   $$;
-
--- Tables we lock down. Auth/onboarding tables (users, institutions) are
--- gated at the app layer and by SECURITY DEFINER functions.
 
 alter table classes        enable row level security;
 alter table classes        force  row level security;
@@ -23,13 +23,13 @@ alter table process_traces force  row level security;
 alter table analyses       enable row level security;
 alter table analyses       force  row level security;
 
--- classes: teacher owns the row.
+drop policy if exists classes_owner_all on classes;
 create policy classes_owner_all on classes
   for all
   using (teacher_id = current_user_id())
   with check (teacher_id = current_user_id());
 
--- students: teacher owns the class.
+drop policy if exists students_owner_all on students;
 create policy students_owner_all on students
   for all
   using (exists (
@@ -39,7 +39,7 @@ create policy students_owner_all on students
     select 1 from classes c where c.id = students.class_id and c.teacher_id = current_user_id()
   ));
 
--- submissions: teacher owns the student → class.
+drop policy if exists submissions_owner_all on submissions;
 create policy submissions_owner_all on submissions
   for all
   using (exists (
@@ -53,7 +53,7 @@ create policy submissions_owner_all on submissions
     where s.id = submissions.student_id and c.teacher_id = current_user_id()
   ));
 
--- process_traces: teacher owns the submission.
+drop policy if exists process_traces_owner_all on process_traces;
 create policy process_traces_owner_all on process_traces
   for all
   using (exists (
@@ -69,7 +69,7 @@ create policy process_traces_owner_all on process_traces
     where sub.id = process_traces.submission_id and c.teacher_id = current_user_id()
   ));
 
--- analyses: teacher owns the submission.
+drop policy if exists analyses_owner_all on analyses;
 create policy analyses_owner_all on analyses
   for all
   using (exists (
