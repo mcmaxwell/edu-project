@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Button, Input, Card } from '@inkprint/ui'
+import { Button, Input } from '@inkprint/ui'
 import { requireSession } from '@/server/auth/require'
 
 export const metadata = { title: 'Welcome' }
@@ -104,12 +104,6 @@ function KeyStep() {
         Inkprint runs analyses through OpenAI, Anthropic, or Gemini. You can plug in your own API
         key (recommended for unlimited use), or skip and request pooled-key access from an admin.
       </p>
-      <Card className="mb-6">
-        <p className="text-body-sm text-slate">
-          The full add-key flow lands with the BYOK release (Step 9). For now, choose <em>skip</em>{' '}
-          and we&apos;ll get you to the dashboard.
-        </p>
-      </Card>
       <div className="flex items-center gap-3">
         <form action="/api/onboarding/skip-key" method="post">
           <Button type="submit" size="lg">
@@ -117,8 +111,8 @@ function KeyStep() {
           </Button>
         </form>
         <Link href="/settings/keys">
-          <Button variant="secondary" size="lg" disabled>
-            Add a key (Step 9)
+          <Button variant="secondary" size="lg">
+            Add a key now
           </Button>
         </Link>
       </div>

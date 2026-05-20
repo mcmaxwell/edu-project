@@ -500,13 +500,15 @@ Step-by-step build order. Each step is a single, mergeable slice — finish and 
 - [x] Middleware updated to gate `/onboarding`; `/app` layout redirects to `/onboarding` if `onboardingStep !== 'complete'`.
 - **Verified:** end-to-end against Neon: new user signs up → bounced to `/onboarding` → picks role → skips key → creates a class → lands on `/app` dashboard. State is resumable (refreshing mid-flow re-renders the correct step). RLS engaged on the class insert.
 
-### Step 9 — BYOK (own API key)
-- [ ] KMS master key provisioned (AWS KMS via Vercel OIDC).
-- [ ] `packages/providers/{openai,anthropic,gemini,azure}.ts` adapters implementing `LlmProvider`.
-- [ ] `POST /api/keys`: validate against provider → encrypt with AES-256-GCM → store.
-- [ ] `GET /api/keys`, `POST /api/keys/:id/test`, `DELETE /api/keys/:id`.
-- [ ] `/settings/keys` UI matching the mockup in `TECHNICAL.md §5.3`.
-- **Done when:** a user can add an OpenAI key, see it validated, and revoke it; ciphertext is never logged.
+### Step 9 — BYOK (own API key) — ✅ DONE
+- [x] **Decision:** local dev uses an env-var master key (`INKPRINT_MASTER_KEY`, 32 random bytes base64) for AES-256-GCM. Production swaps in AWS KMS envelope encryption behind the same `encrypt()` / `decrypt()` interface — no caller-side change needed. Keeps Step 14 deployable without an AWS account.
+- [x] `apps/web/server/crypto.ts` — AES-256-GCM (12-byte IV, auth tag) + SHA-256 fingerprint for dup detection + `lastFour()` mask.
+- [x] `packages/providers/src/` — `LlmProvider` interface + adapters for `openai`, `anthropic`, `gemini` (each implements `validateKey()` by calling the provider's `/models` list endpoint with an 8s timeout). Azure adapter intentionally deferred (institutional plan).
+- [x] `apps/web/server/keys.ts` — `addKeyForUser` (validate → dedupe via hash → encrypt → insert), `listKeysForUser`, `revokeKeyForUser`, `testKeyForUser` (decrypt → re-validate → update `last_used_at`).
+- [x] API routes: `POST/GET /api/keys`, `POST /api/keys/[id]/test`, `DELETE/POST /api/keys/[id]`.
+- [x] `/settings/keys` page: lists keys with provider + label + masked last-four + status badge + Test / Revoke actions; add-key form with provider radio + label + plaintext key.
+- [x] Middleware extended to gate `/settings/*`; onboarding step-2 "Add a key now" button now links to `/settings/keys` instead of being disabled.
+- **Verified end-to-end against Neon and the real OpenAI API:** invalid key rejected (HTTP 401 surfaced to the UI), real key validated against `api.openai.com/v1/models`, stored with `••••BckA` mask, re-test against provider succeeds, duplicate add rejected, revoke transitions status from `active` → `revoked`, **0 mentions of the plaintext key in the dev log** (grep-counted).
 
 ### Step 10 — Analysis pipeline (text first)
 - [ ] File-parsing pipeline (txt, md, docx, pdf) — `TECHNICAL.md §1`.

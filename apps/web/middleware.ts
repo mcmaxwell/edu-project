@@ -6,7 +6,10 @@ export function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname
   const hasCookie = Boolean(req.cookies.get(SESSION_COOKIE))
   const isProtected =
-    path.startsWith('/app') || path.startsWith('/admin') || path.startsWith('/onboarding')
+    path.startsWith('/app') ||
+    path.startsWith('/admin') ||
+    path.startsWith('/onboarding') ||
+    path.startsWith('/settings')
 
   if (isProtected && !hasCookie) {
     const url = new URL('/login', req.nextUrl.origin)
@@ -19,5 +22,11 @@ export function middleware(req: NextRequest) {
 export const config = {
   // Fast-path gate. The full session check (DB lookup, expiry, status) runs in
   // the gated page's server component via requireSession().
-  matcher: ['/app/:path*', '/admin/:path*', '/onboarding/:path*', '/onboarding'],
+  matcher: [
+    '/app/:path*',
+    '/admin/:path*',
+    '/onboarding/:path*',
+    '/onboarding',
+    '/settings/:path*',
+  ],
 }
