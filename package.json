@@ -14,7 +14,13 @@
     "typecheck": "turbo typecheck",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "spell": "cspell \"**/*.md\" \"**/*.{ts,tsx}\""
+    "spell": "cspell \"**/*.md\" \"**/*.{ts,tsx}\"",
+    "db:generate": "pnpm --filter @inkprint/db generate",
+    "db:push": "pnpm --filter @inkprint/db push",
+    "db:migrate": "pnpm --filter @inkprint/db migrate",
+    "db:apply-rls": "pnpm --filter @inkprint/db apply-rls",
+    "db:studio": "pnpm --filter @inkprint/db studio",
+    "db:verify": "pnpm --filter @inkprint/db verify"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",

@@ -1,0 +1,29 @@
+{
+  "name": "@inkprint/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "generate": "drizzle-kit generate",
+    "push": "drizzle-kit push",
+    "migrate": "tsx src/migrate.ts",
+    "studio": "drizzle-kit studio",
+    "apply-rls": "tsx src/apply-rls.ts",
+    "verify": "tsx src/verify.ts",
+    "setup-app-role": "tsx src/setup-app-role.ts"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.36.1",
+    "postgres": "^3.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.16.10",
+    "drizzle-kit": "^0.28.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

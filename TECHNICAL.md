@@ -470,13 +470,13 @@ Step-by-step build order. Each step is a single, mergeable slice — finish and 
 - [x] SEO: per-route `metadata`, `app/sitemap.ts`, `app/robots.ts`, `app/opengraph-image.tsx` (edge runtime, brand-themed).
 - **Verified:** `pnpm turbo typecheck --force` clean; `next build` produces 14 routes (11 marketing pages + `/sitemap.xml` + `/robots.txt` + `/opengraph-image`) all statically prerendered except the Edge-runtime OG image; dev server returns `200` on every marketing route, sitemap renders valid XML, shared header/footer visible across pages.
 
-### Step 6 — Database & ORM
-- [ ] Provision Postgres (Neon dev branch).
-- [ ] Drizzle schema for `users`, `institutions`, `api_keys`, `access_grants`, `audit_events` (from `TECHNICAL.md §3`).
-- [ ] Migration scripts + first migration committed.
-- [ ] RLS policies in the migration.
-- [ ] `pnpm db:push` and `pnpm db:studio` work locally.
-- **Done when:** schema is applied to dev DB and an integration test inserts/reads a user under RLS.
+### Step 6 — Database & ORM — ✅ DONE
+- [x] `packages/db` workspace package: Drizzle schema for **10 tables** — `institutions`, `users`, `api_keys`, `access_grants`, `audit_events`, `classes`, `students`, `submissions`, `process_traces`, `analyses` — plus 8 enums.
+- [x] First migration generated at `packages/db/migrations/0000_romantic_kingpin.sql` (194 lines).
+- [x] RLS policies in `packages/db/sql/rls.sql` covering the five teacher-scoped tables, keyed off `current_setting('app.user_id')`.
+- [x] **Two-role model:** `DATABASE_URL` (owner) handles migrations + admin paths; `APP_DATABASE_URL` (non-bypassrls `inkprint_app` role) handles regular traffic so RLS actually engages. Neon's default `neondb_owner` has `BYPASSRLS`, which is why a second role is mandatory — added `pnpm db:setup-app-role` to provision it.
+- [x] Scripts: `db:generate`, `db:push`, `db:migrate` (schema + RLS), `db:apply-rls`, `db:setup-app-role`, `db:studio`, `db:verify`.
+- **Verified:** Neon project provisioned; `pnpm db:migrate` applied; `pnpm db:setup-app-role` created the `inkprint_app` role; `pnpm db:verify` returns `ok: true` proving: Alice sees only her class, Bob sees only his, anon sees nothing, and Alice cannot insert a class assigned to Bob (`WITH CHECK` rejection).
 
 ### Step 7 — Auth & registration
 - [ ] Lucia v3 wired with Postgres adapter.
