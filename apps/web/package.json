@@ -1,0 +1,12 @@
+{
+  "name": "@inkprint/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "echo 'next build — added in Step 2'",
+    "dev": "echo 'next dev — added in Step 2'",
+    "lint": "echo 'eslint — added in Step 2'",
+    "typecheck": "echo 'tsc --noEmit — added in Step 2'"
+  }
+}
