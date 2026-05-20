@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <title>Inkprint — Mark Only</title>
+  <g fill="none" stroke="#1B2A4E" stroke-width="2.6" stroke-linecap="round">
+    <path d="M32 6 C18 6 10 18 10 32 C10 41 13 47 16 53"/>
+    <path d="M32 12 C20 12 14 21 14 32 C14 40 16 45 19 50"/>
+    <path d="M32 18 C24 18 19 24 19 32 C19 39 21 43 23 48"/>
+    <path d="M32 24 C27.5 24 25.5 28 25.5 32 C25.5 36.5 26 40 27 44"/>
+    <path d="M32 30 L32 45"/>
+    <path d="M38 24 C41 25.5 41 29 41 32.5 C41 37 40 40 38 44"/>
+    <path d="M43 18 C47 21.5 46 28 46 33 C46 38 45 41.5 43 46"/>
+    <path d="M48 12 C53 16 52 24 52 32 C52 39 51.5 43 49 49"/>
+  </g>
+  <circle cx="56" cy="55" r="3.4" fill="#E26D5A"/>
+</svg>

@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Inkprint — Design Presentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2A4E; --ink-700:#2A3B66; --ink-300:#8C97B5;
+    --parchment:#F6F1E7; --paper:#FFFFFF;
+    --coral:#E26D5A; --coral-200:#F7C9C0;
+    --slate:#6B7280; --moss:#3F6B4E; --sand:#EADFC6; --charcoal:#111827;
+    --serif:"Newsreader", serif;
+    --sans:"Inter", system-ui, sans-serif;
+    --mono:"JetBrains Mono", ui-monospace, monospace;
+    --ease:cubic-bezier(.2,.8,.2,1);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#3a3a3a;font-family:var(--sans);color:var(--ink);}
+  @page { size: 1280px 800px; margin: 0; }
+  .slide{
+    width:1280px; height:800px; position:relative; overflow:hidden;
+    background:var(--parchment); page-break-after:always; break-after:page;
+    padding:64px 80px; display:flex; flex-direction:column;
+  }
+  .slide:last-child{page-break-after:auto}
+  .eyebrow{font-family:var(--sans); font-weight:600; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--slate);}
+  .h-display{font-family:var(--serif); font-weight:500; font-size:84px; line-height:1.02; letter-spacing:-.015em; color:var(--ink); margin:0;}
+  .h1{font-family:var(--serif); font-weight:500; font-size:56px; line-height:1.08; letter-spacing:-.01em; color:var(--ink); margin:0 0 20px;}
+  .h2{font-family:var(--serif); font-weight:500; font-size:34px; line-height:1.15; color:var(--ink); margin:0 0 14px;}
+  .lead{font-family:var(--sans); font-size:20px; line-height:1.55; color:var(--slate); max-width:780px; margin:0;}
+  .body{font-family:var(--sans); font-size:16px; line-height:1.65; color:var(--slate);}
+  em.coral{font-style:italic; color:var(--coral);}
+  .ital{font-style:italic;}
+
+  /* Top header on every slide */
+  .topbar{display:flex; align-items:center; justify-content:space-between; margin-bottom:36px;}
+  .logo{display:flex; align-items:center; gap:12px;}
+  .logo .mark{width:32px; height:32px; flex:none;}
+  .logo .word{font-family:var(--serif); font-style:italic; font-weight:500; font-size:22px; color:var(--ink); letter-spacing:-.01em;}
+  .page-num{font-family:var(--mono); font-size:11px; color:var(--ink-300); letter-spacing:.06em;}
+
+  .btn{display:inline-flex; align-items:center; gap:10px; padding:14px 22px; border-radius:8px; font-family:var(--sans); font-weight:600; font-size:15px; line-height:1; text-decoration:none;}
+  .btn-primary{background:var(--ink); color:var(--parchment);}
+  .btn-secondary{background:transparent; color:var(--ink); border:1px solid var(--ink);}
+  .cta-row{display:flex; gap:14px; margin-top:36px;}
+
+  .card{background:var(--paper); border:1px solid var(--sand); border-radius:12px; padding:24px;}
+
+  /* COVER */
+  .cover{background:var(--parchment); padding:80px;}
+  .cover .watermark{position:absolute; right:-80px; bottom:-80px; width:520px; height:520px; opacity:.06;}
+  .cover .meta{display:flex; gap:24px; align-items:center; margin-top:48px; color:var(--slate); font-size:14px;}
+  .cover .meta span{display:inline-flex; align-items:center; gap:8px;}
+  .cover .dot{width:6px;height:6px;border-radius:99px;background:var(--coral);display:inline-block}
+
+  /* SECTION TITLE */
+  .section-cover{justify-content:center;}
+  .section-cover .num{font-family:var(--mono); font-size:14px; color:var(--coral); letter-spacing:.1em;}
+
+  /* Two col */
+  .two{display:grid; grid-template-columns:1.1fr 1fr; gap:48px; flex:1;}
+  .three{display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:28px;}
+  .four{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:28px;}
+
+  .step{padding:24px; background:var(--paper); border:1px solid var(--sand); border-radius:12px; position:relative;}
+  .step .n{font-family:var(--serif); font-style:italic; font-size:48px; color:var(--coral); line-height:1; margin-bottom:8px;}
+  .step h3{font-family:var(--serif); font-weight:500; font-size:22px; margin:0 0 8px; color:var(--ink);}
+  .step p{margin:0; font-size:14px; line-height:1.55; color:var(--slate);}
+
+  /* Evidence panel mock */
+  .doc{background:var(--paper); border:1px solid var(--sand); border-radius:12px; padding:28px; font-family:var(--serif); font-size:17px; line-height:1.7; color:var(--charcoal); position:relative;}
+  .doc .meta{display:flex; justify-content:space-between; margin-bottom:18px; font-family:var(--sans); font-size:12px; color:var(--slate); text-transform:uppercase; letter-spacing:.08em;}
+  .hl{background:rgba(247,201,192,.6); border-bottom:2px wavy var(--coral); padding:2px 0; text-decoration:underline wavy var(--coral); text-underline-offset:4px;}
+  .margin-note{position:absolute; right:-180px; top:80px; width:160px; font-family:var(--serif); font-style:italic; font-size:13px; color:var(--coral); line-height:1.4;}
+  .margin-note::before{content:""; position:absolute; left:-22px; top:8px; width:16px; height:1px; background:var(--coral);}
+
+  /* Sidebar evidence */
+  .evidence-sidebar{background:var(--paper); border:1px solid var(--sand); border-radius:12px; padding:22px;}
+  .evidence-sidebar h4{font-family:var(--serif); font-size:18px; margin:0 0 10px; color:var(--ink); font-weight:500;}
+  .row{display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--sand); font-size:13px; color:var(--slate);}
+  .row:last-child{border-bottom:none}
+  .row strong{color:var(--ink); font-weight:600; font-family:var(--mono); font-size:12px;}
+  .pill{display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border-radius:999px; font-size:11px; font-weight:600; font-family:var(--sans); letter-spacing:.02em;}
+  .pill-flag{background:var(--coral-200); color:var(--coral);}
+  .pill-ok{background:var(--sand); color:var(--moss);}
+
+  /* Color swatches */
+  .swatch{border-radius:12px; padding:18px; height:130px; display:flex; flex-direction:column; justify-content:space-between; border:1px solid var(--sand);}
+  .swatch .name{font-family:var(--sans); font-weight:600; font-size:13px;}
+  .swatch .hex{font-family:var(--mono); font-size:11px; opacity:.8;}
+
+  /* Type specimens */
+  .type-row{display:grid; grid-template-columns:160px 1fr; align-items:baseline; padding:20px 0; border-bottom:1px solid var(--sand); gap:24px;}
+  .type-row:last-child{border:none}
+  .type-row .label{font-family:var(--mono); font-size:11px; color:var(--slate); letter-spacing:.06em; text-transform:uppercase;}
+  .specimen-display{font-family:var(--serif); font-size:54px; line-height:1.05; color:var(--ink); letter-spacing:-.015em;}
+  .specimen-h2{font-family:var(--serif); font-size:32px; color:var(--ink);}
+  .specimen-body{font-family:var(--sans); font-size:17px; color:var(--ink);}
+  .specimen-eyebrow{font-family:var(--sans); font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--ink);}
+  .specimen-mono{font-family:var(--mono); font-size:14px; color:var(--ink);}
+
+  /* Differentiation table */
+  table.diff{width:100%; border-collapse:collapse; margin-top:18px; font-size:14px;}
+  table.diff th, table.diff td{padding:14px 16px; text-align:left; border-bottom:1px solid var(--sand);}
+  table.diff th{font-family:var(--sans); font-weight:600; color:var(--ink); font-size:12px; letter-spacing:.06em; text-transform:uppercase;}
+  table.diff td{font-family:var(--sans); color:var(--slate); vertical-align:top;}
+  table.diff td.us{color:var(--ink); font-weight:500;}
+
+  /* Pricing */
+  .price-card{background:var(--paper); border:1px solid var(--sand); border-radius:12px; padding:28px; display:flex; flex-direction:column;}
+  .price-card.feature{background:var(--ink); color:var(--parchment); border-color:var(--ink);}
+  .price-card h3{font-family:var(--serif); font-size:24px; margin:0 0 6px; font-weight:500;}
+  .price-card .price{font-family:var(--serif); font-size:42px; margin:14px 0 4px; font-weight:500;}
+  .price-card .price small{font-family:var(--sans); font-size:13px; opacity:.7; font-weight:400;}
+  .price-card ul{list-style:none; padding:0; margin:18px 0 0; font-size:13px; line-height:1.9;}
+  .price-card.feature ul li::before, .price-card ul li::before{content:"✦  "; color:var(--coral); }
+
+  /* LMS chips */
+  .chips{display:flex; flex-wrap:wrap; gap:10px; margin-top:16px;}
+  .chip{padding:8px 14px; border-radius:999px; background:var(--paper); border:1px solid var(--sand); font-size:13px; color:var(--ink);}
+
+  /* Footer slide */
+  .ink-bg{background:var(--ink); color:var(--parchment);}
+  .ink-bg .h-display, .ink-bg .h1, .ink-bg .h2{color:var(--parchment);}
+  .ink-bg .lead{color:rgba(246,241,231,.75);}
+  .ink-bg .logo .word{color:var(--parchment);}
+  .ink-bg .btn-primary{background:var(--coral); color:var(--parchment);}
+  .ink-bg .btn-secondary{border-color:var(--parchment); color:var(--parchment);}
+  .ink-bg .watermark{opacity:.08;}
+
+  /* Hero mock */
+  .hero-mock{background:var(--parchment); border:1px solid var(--sand); border-radius:14px; padding:48px; position:relative;}
+  .hero-mock .nav{display:flex; justify-content:space-between; align-items:center; margin-bottom:48px;}
+  .hero-mock .nav .links{display:flex; gap:22px; font-family:var(--sans); font-size:14px; color:var(--ink);}
+  .hero-mock h1{font-family:var(--serif); font-size:62px; line-height:1.04; margin:0; font-weight:500; letter-spacing:-.015em;}
+  .hero-mock h1 .it{font-style:italic;}
+  .hero-mock h1 .it .uline{ text-decoration:underline; text-decoration-color:var(--coral); text-decoration-thickness:2px; text-underline-offset:6px;}
+  .hero-mock p.sub{font-size:18px; color:var(--slate); margin-top:22px; max-width:580px; line-height:1.55;}
+  .hero-mock .cta{margin-top:36px;}
+
+  /* Social proof */
+  .logos{display:flex; align-items:center; gap:36px; opacity:.55; margin-top:28px; flex-wrap:wrap;}
+  .logos span{font-family:var(--serif); font-size:18px; color:var(--ink); font-style:italic;}
+
+  /* SVG fingerprint mark — shared */
+</style>
+</head>
+<body>
+
+<!-- ===== Slide 1 : COVER ===== -->
+<section class="slide cover">
+  <div class="topbar">
+    <div class="logo">
+      <svg class="mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g stroke="#1B2A4E" stroke-width="2" stroke-linecap="round" fill="none">
+          <path d="M24 6 C14 6 8 14 8 24 C8 30 10 34 12 38"/>
+          <path d="M24 10 C16 10 12 17 12 24 C12 30 13.5 33 15 36"/>
+          <path d="M24 14 C18 14 16 19 16 24 C16 29 17 32 18 35"/>
+          <path d="M24 18 C20 18 20 22 20 24 C20 28 20 31 21 34"/>
+          <path d="M24 22 L24 33"/>
+          <path d="M28 18 C30 19 30 22 30 25 C30 29 29 31 28 33"/>
+          <path d="M32 14 C35 16 34 21 34 25 C34 30 33 33 32 35"/>
+          <path d="M36 10 C39 13 38 19 38 25 C38 30 37.5 33 36 36"/>
+        </g>
+        <circle cx="36" cy="40" r="2.5" fill="#E26D5A"/>
+      </svg>
+      <span class="word">Inkprint</span>
+    </div>
+    <span class="eyebrow">Design Presentation · v0.1</span>
+  </div>
+
+  <div style="flex:1; display:flex; flex-direction:column; justify-content:center; max-width:920px;">
+    <span class="eyebrow" style="color:var(--coral); margin-bottom:18px;">Brand &amp; Product Design</span>
+    <h1 class="h-display">
+      See the difference between<br/>
+      <em class="coral ital">effort</em> and <span class="ital">autocomplete</span>.
+    </h1>
+    <p class="lead" style="margin-top:28px; font-size:22px;">
+      A writing-process platform for teachers, built on evidence — not verdicts.
+      This deck walks through the Inkprint brand system and the marketing landing page.
+    </p>
+    <div class="meta">
+      <span><span class="dot"></span> Literary &amp; Academic identity</span>
+      <span><span class="dot"></span> Pro-teacher, pro-student</span>
+      <span><span class="dot"></span> Evidence over verdicts</span>
+    </div>
+  </div>
+
+  <svg class="watermark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="#1B2A4E" stroke-width="1.2" stroke-linecap="round" fill="none">
+      <path d="M24 4 C13 4 6 13 6 24 C6 31 8 36 11 41"/>
+      <path d="M24 8 C15 8 10 16 10 24 C10 30 11.5 34 14 39"/>
+      <path d="M24 12 C17 12 14 18 14 24 C14 29 15 33 17 37"/>
+      <path d="M24 16 C19 16 18 20 18 24 C18 28 18 32 20 35"/>
+      <path d="M24 20 L24 33"/>
+      <path d="M28 16 C31 18 30 22 30 26 C30 30 29 33 28 35"/>
+      <path d="M32 12 C36 15 34 21 34 26 C34 31 33 34 31 37"/>
+      <path d="M36 8 C40 12 38 19 38 25 C38 31 37.5 34 35 39"/>
+      <path d="M40 4 C44 9 42 17 42 24 C42 31 41 36 38 41"/>
+    </g>
+  </svg>
+</section>
+
+<!-- ===== Slide 2 : VISION ===== -->
+<section class="slide section-cover" style="align-items:center; text-align:center;">
+  <div class="topbar" style="position:absolute; left:80px; right:80px; top:64px;">
+    <div class="logo">
+      <svg class="mark" viewBox="0 0 48 48"><g stroke="#1B2A4E" stroke-width="2" stroke-linecap="round" fill="none"><path d="M24 6 C14 6 8 14 8 24 C8 30 10 34 12 38"/><path d="M24 10 C16 10 12 17 12 24 C12 30 13.5 33 15 36"/><path d="M24 14 C18 14 16 19 16 24 C16 29 17 32 18 35"/><path d="M24 18 C20 18 20 22 20 24 C20 28 20 31 21 34"/><path d="M24 22 L24 33"/><path d="M28 18 C30 19 30 22 30 25 C30 29 29 31 28 33"/><path d="M32 14 C35 16 34 21 34 25 C34 30 33 33 32 35"/><path d="M36 10 C39 13 38 19 38 25 C38 30 37.5 33 36 36"/></g><circle cx="36" cy="40" r="2.5" fill="#E26D5A"/></svg>
+      <span class="word">Inkprint</span>
+    </div>
+    <span class="page-num">02 / 10</span>
+  </div>
+
+  <div style="max-width:900px; text-align:center;">
+    <span class="num">01 — VISION</span>
+    <h1 class="h-display" style="margin-top:24px; font-size:64px;">
+      A platform that captures <em class="ital coral">how</em> the work was made —
+      <span style="color:var(--slate);">not just what it looks like.</span>
+    </h1>
+    <p class="lead" style="margin:36px auto 0; text-align:center; font-size:19px;">
+      Inkprint is not an output classifier. It is a writing-process platform that treats AI
+      as a collaborator to be evaluated — not an enemy to be detected. A better LLM doesn't
+      help a student fake a 90-minute writing session.
+    </p>
+  </div>
+</section>
+
+<!-- ===== Slide 3 : DIFFERENTIATION ===== -->
+<section class="slide">
+  <div class="topbar">
+    <div class="logo">
+      <svg class="mark" viewBox="0 0 48 48"><g stroke="#1B2A4E" stroke-width="2" stroke-linecap="round" fill="none"><path d="M24 6 C14 6 8 14 8 24 C8 30 10 34 12 38"/><path d="M24 10 C16 10 12 17 12 24 C12 30 13.5 33 15 36"/><path d="M24 14 C18 14 16 19 16 24 C16 29 17 32 18 35"/><path d="M24 18 C20 18 20 22 20 24 C20 28 20 31 21 34"/><path d="M24 22 L24 33"/><path d="M28 18 C30 19 30 22 30 25 C30 29 29 31 28 33"/><path d="M32 14 C35 16 34 21 34 25 C34 30 33 33 32 35"/><path d="M36 10 C39 13 38 19 38 25 C38 30 37.5 33 36 36"/></g><circle cx="36" cy="40" r="2.5" fill="#E26D5A"/></svg>
+      <span class="word">Inkprint</span>
+    </div>
+    <span class="page-num">03 / 10</span>
+  </div>
+  <span class="eyebrow" style="color:var(--coral);">02 — Differentiation</span>
+  <h1 class="h1" style="margin-top:12px;">Structural, not cosmetic.</h1>
+  <p class="lead" style="margin-bottom:8px;">Where incumbents compete on a single output score, Inkprint changes the axis entirely.</p>
+  <table class="diff">
+    <thead><tr><th style="width:24%">Axis</th><th style="width:38%">Incumbents</th><th style="width:38%; color:var(--coral);">Inkprint</th></tr></thead>
+    <tbody>
+      <tr><td>What's analyzed</td><td>The finished text</td><td class="us">The writing process itself</td></tr>
+      <tr><td>Compared to</td><td>A global AI-vs-human model</td><td class="us">The student's own prior work</td></tr>
+      <tr><td>Framing</td><td>Catch cheaters</td><td class="us">Evaluate AI collaboration</td></tr>
+      <tr><td>Output</td><td>A percentage</td><td class="us">An evidence sheet for a conversation</td></tr>
+      <tr><td>Defensibility vs new LLMs</td><td>Erodes with every model</td><td class="us">Unaffected — process can't be faked</td></tr>
+      <tr><td>Lawsuit exposure</td><td>High — false positives</td><td class="us">Low — process + per-student baseline</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ===== Slide 4 : LANDING HERO MOCK ===== -->
+<section class="slide">
+  <div class="topbar">
+    <div class="logo">
+      <svg class="mark" viewBox="0 0 48 48"><g stroke="#1B2A4E" stroke-width="2" stroke-linecap="round" fill="none"><path d="M24 6 C14 6 8 14 8 24 C8 30 10 34 12 38"/><path d="M24 10 C16 10 12 17 12 24 C12 30 13.5 33 15 36"/><path d="M24 14 C18 14 16 19 16 24 C16 29 17 32 18 35"/><path d="M24 18 C20 18 20 22 20 24 C20 28 20 31 21 34"/><path d="M24 22 L24 33"/><path d="M28 18 C30 19 30 22 30 25 C30 29 29 31 28 33"/><path d="M32 14 C35 16 34 21 34 25 C34 30 33 33 32 35"/><path d="M36 10 C39 13 38 19 38 25 C38 30 37.5 33 36 36"/></g><circle cx="36" cy="40" r="2.5" fill="#E26D5A"/></svg>
+      <span class="word">Inkprint</span>
+    </div>
+    <span class="page-num">04 / 10</span>
+  </div>
+  <span class="eyebrow" style="color:var(--coral);">03 — Landing Page · Hero</span>
+  <h2 class="h2" style="margin-top:10px; margin-bottom:18px;">The first ten seconds.</h2>
+
+  <div class="hero-mock" style="flex:1;">
+    <div class="nav">
+      <div class="logo">
+        <svg class="mark" viewBox="0 0 48 48"><g stroke="#1B2A4E" stroke-width="2" stroke-linecap="round" fill="none"><path d="M24 6 C14 6 8 14 8 24 C8 30 10 34 12 38"/><path d="M24 10 C16 10 12 17 12 24 C12 30 13.5 33 15 36"/><path d="M24 14 C18 14 16 19 16 24 C16 29 17 32 18 35"/><path d="M24 18 C20 18 20 22 20 24 C20 28 20 31 21 34"/><path d="M24 22 L24 33"/><path d="M28 18 C30 19 30 22 30 25 C30 29 29 31 28 33"/><path d="M32 14 C35 16 34 21 34 25 C34 30 33 33 32 35"/><path d="M36 10 C39 13 38 19 38 25 C38 30 37.5 33 36 36"/></g><circle cx="36" cy="40" r="2.5" fill="#E26D5A"/></svg>
+        <span class="word">Inkprint</span>
+      </div>
+      <div class="links">
+        <span>Product</span><span>For Teachers</span><span>Research</span><span>Pricing</span><span>About</span>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <a class="btn btn-secondary" style="padding:10px 16px; font-size:13px;">Sign in</a>
+        <a class="btn btn-primary" style="padding:10px 16px; font-size:13px;">Start a pilot</a>
+      </div>
+    </div>
+
+    <h1>
+      See the difference between<br/>
+      <span class="it"><span class="uline">effort</span></span> and <span class="it">autocomplete</span>.
+    </h1>
+    <p class="sub">Inkprint reads how an essay was written — keystrokes, pauses, revisions — and gives teachers a one-page evidence sheet, not a verdict.</p>
+    <div class="cta">
+      <a class="btn btn-primary">Start a free pilot →</a>
+      <a class="btn btn-secondary" style="margin-left:10px;">Watch 60-second demo</a>
+    </div>
+
+    <div class="logos">
+      <span class="eyebrow" style="opacity:.8;">Piloting with</span>
+      <span>Westfield Academy</span>
+      <span>Northbridge University</span>
+      <span>Linden K-12</span>
+      <span>Stoneham College</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Slide 5 : HOW IT WORKS ===== -->
+<section class="slide">
+  <div class="topbar">
+    <div class="logo">
+      <svg class="mark" viewBox="0 0 48 48"><g stroke="#1B2A4E" stroke-width="2" stroke-linecap="round" fill="none"><path d="M24 6 C14 6 8 14 8 24 C8 30 10 34 12 38"/><path d="M24 10 C16 10 12 17 12 24 C12 30 13.5 33 15 36"/><path d="M24 14 C18 14 16 19 16 24 C16 29 17 32 18 35"/><path d="M24 18 C20 18 20 22 20 24 C20 28 20 31 21 34"/><path d="M24 22 L24 33"/><path d="M28 18 C30 19 30 22 30 25 C30 29 29 31 28 33"/><path d="M32 14 C35 16 34 21 34 25 C34 30 33 33 32 35"/><path d="M36 10 C39 13 38 19 38 25 C38 30 37.5 33 36 36"/></g><circle cx="36" cy="40" r="2.5" fill="#E26D5A"/></svg>
+      <span class="word">Inkprint</span>
+    </div>
+    <span class="page-num">05 / 10</span>
+  </div>
+  <span class="eyebrow" style="color:var(--coral);">04 — How it works</span>
+  <h1 class="h1" style="margin-top:10px;">Three steps, one evidence sheet.</h1>
+  <p class="lead">Inkprint sits quietly behind the writing tools teachers and students already use.</p>
+
+  <div class="three" style="margin-top:36px;">
+    <div class="step">
+      <div class="n">01</div>
+      <h3>Capture the process</h3>
+      <p>A lightweight editor, browser extension, and Docs/Word add-in record keystrokes, pauses, revisions, and paste events while the student writes.</p>
+    </div>
+    <div class="step">
+      <div class="n">02</div>
+      <h3>Compare to baseline</h3>
+      <p>Every submission is measured against that student's own verified prior work — not a global AI-vs-human model. The baseline strengthens with use.</p>
+    </div>
+    <div class="step">
+      <div class="n">03</div>
+      <h3>Read the evidence</h3>
+      <p>Teachers get a one-page evidence document, not a percentage. Flagged passages link to the process moments that produced them.</p>
+    </div>
+  </div>
+
+  <div style="margin-top:32px; display:flex; gap:16px; align-items:center; padding:18px 22px; background:var(--paper); border:1px solid var(--sand); border-radius:12px;">
+    <span class="pill pill-ok">✓ Evidence over verdicts</span>
+    <span class="pill pill-ok">✓ Per-student baseline</span>
+    <span class="pill pill-ok">✓ FERPA &amp; GDPR aligned</span>
+    <span class="pill pill-flag">⚑ Coral = teacher review</span>
+  </div>
+</section>
+
+<!-- ===== Slide 6 : EVIDENCE PANEL ===== -->
+<section class="slide">
+  <div class="topbar">
+    <div class="logo">
+      <svg class="mark" viewBox="0 0 48 48"><g stroke="#1B2A4E" stroke-width="2" stroke-linecap="round" fill="none"><path d="M24 6 C14 6 8 14 8 24 C8 30 10 34 12 38"/><path d="M24 10 C16 10 12 17 12 24 C12 30 13.5 33 15 36"/><path d="M24 14 C18 14 16 19 16 24 C16 29 17 32 18 35"/><path d="M24 18 C20 18 20 22 20 24 C20 28 20 31 21 34"/><path d="M24 22 L24 33"/><path d="M28 18 C30 19 30 22 30 25 C30 29 29 31 28 33"/><path d="M32 14 C35 16 34 21 34 25 C34 30 33 33 32 35"/><path d="M36 10 C39 13 38 19 38 25 C38 30 37.5 33 36 36"/></g><circle cx="36" cy="40" r="2.5" fill="#E26D5A"/></svg>
+      <span class="word">Inkprint</span>
+    </div>
+    <span class="page-num">06 / 10</span>
+  </div>
+  <span class="eyebrow" style="color:var(--coral);">05 — Product · Evidence Panel</span>
+  <h1 class="h1" style="margin-top:10px;">The microscope, not the verdict.</h1>
+
+  <div class="two" style="margin-top:14px;">
+    <div class="doc">
+      <div class="meta">
+        <span>Essay · A. Marquez · Grade 11</span>
+        <span>1,284 words · 92 min · 14 revisions</span>
+      </div>
+      <p style="margin:0 0 12px;">The novel opens with an image of confinement that recurs through Chapter Three — the rusted gate, the locked study, the curtain drawn against the harbor. Marlowe's prose accumulates these symbols slowly, almost patiently, so that by the time the inheritance is announced the reader already feels the shape of the house closing in.</p>
+      <p style="margin:0 0 12px;"><span class="hl">Furthermore, the symbolism of confinement serves as a profound metaphor that effectively underscores the protagonist's internal struggle, thereby enriching the narrative's thematic depth.</span> In contrast, the second chapter eases the grip slightly: there is the morning at the dock, the open sail, the unforced laughter of strangers.</p>
+      <p style="margin:0;">The reader notices, though, that even these scenes are framed by windows — and the windows are always shut.</p>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:18px;">
+      <div class="evidence-sidebar">
+        <h4>Evidence summary</h4>
+        <div class="row"><span>Process integrity</span><span class="pill pill-ok">Strong</span></div>
+        <div class="row"><span>Baseline match</span><strong>0.87</strong></div>
+        <div class="row"><span>Paste events</span><strong>2 · 1 flagged</strong></div>
+        <div class="row"><span>Active writing</span><strong>92 min</strong></div>
+        <div class="row"><span>AI declaration</span><span class="pill pill-ok">Grammar only</span></div>
+      </div>
+      <div class="evidence-sidebar">
+        <h4>Flagged passage</h4>
+        <p style="margin:0; font-size:13px; color:var(--slate); line-height:1.55;">
+          <span class="pill pill-flag" style="margin-right:6px;">⚑ Review</span>
+          Pasted at 14:32, 0 prior revisions. Stylistic distance from baseline: <strong style="color:var(--ink); font-family:var(--mono);">2.4σ</strong>.
+        </p>
+        <p style="margin:10px 0 0; font-family:var(--serif); font-style:italic; font-size:13px; color:var(--ink);">"The teacher decides."</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Slide 7 : COLOR ===== -->
+<section class="slide">
+  <div class="topbar">
+    <div class="logo">
+      <svg class="mark" viewBox="0 0 48 48"><g stroke="#1B2A4E" stroke-width="2" stroke-linecap="round" fill="none"><path d="M24 6 C14 6 8 14 8 24 C8 30 10 34 12 38"/><path d="M24 10 C16 10 12 17 12 24 C12 30 13.5 33 15 36"/><path d="M24 14 C18 14 16 19 16 24 C16 29 17 32 18 35"/><path d="M24 18 C20 18 20 22 20 24 C20 28 20 31 21 34"/><path d="M24 22 L24 33"/><path d="M28 18 C30 19 30 22 30 25 C30 29 29 31 28 33"/><path d="M32 14 C35 16 34 21 34 25 C34 30 33 33 32 35"/><path d="M36 10 C39 13 38 19 38 25 C38 30 37.5 33 36 36"/></g><circle cx="36" cy="40" r="2.5" fill="#E26D5A"/></svg>
+      <span class="word">Inkprint</span>
+    </div>
+    <span class="page-num">07 / 10</span>
+  </div>
+  <span class="eyebrow" style="color:var(--coral);">06 — Brand · Color</span>
+  <h1 class="h1" style="margin-top:10px;">Parchment, ink, and a careful drop of coral.</h1>
+  <p class="lead">The page should feel like paper — never punitive. Coral is a highlighter, not a wall paint.</p>
+
+  <div class="four">
+    <div class="swatch" style="background:#1B2A4E; color:#F6F1E7;">
+      <span class="name">Ink Blue</span><span class="hex">#1B2A4E · Primary</span>
+    </div>
+    <div class="swatch" style="background:#F6F1E7; color:#1B2A4E;">
+      <span class="name">Parchment</span><span class="hex">#F6F1E7 · Page</span>
+    </div>
+    <div class="swatch" style="background:#E26D5A; color:#FFFFFF;">
+      <span class="name">Signal Coral</span><span class="hex">#E26D5A · Accent</span>
+    </div>
+    <div class="swatch" style="background:#FFFFFF; color:#1B2A4E;">
+      <span class="name">Paper White</span><span class="hex">#FFFFFF · Surfaces</span>
+    </div>
+  </div>
+  <div class="four" style="margin-top:14px;">
+    <div class="swatch" style="background:#6B7280; color:#FFFFFF; height:90px;">
+      <span class="name">Slate Gray</span><span class="hex">#6B7280 · Body text</span>
+    </div>
+    <div class="swatch" style="background:#F7C9C0; color:#1B2A4E; height:90px;">
+      <span class="name">Coral 200</span><span class="hex">#F7C9C0 · Flag bg</span>
+    </div>
+    <div class="swatch" style="background:#3F6B4E; color:#F6F1E7; height:90px;">
+      <span class="name">Moss</span><span class="hex">#3F6B4E · Inconclusive</span>
+    </div>
+    <div class="swatch" style="background:#EADFC6; color:#1B2A4E; height:90px;">
+      <span class="name">Sand</span><span class="hex">#EADFC6 · Dividers</span>
+    </div>
+  </div>
+
+  <p class="body" style="margin-top:22px; font-size:14px; max-width:840px;">
+    <strong style="color:var(--ink);">Rules.</strong> No surface should be more than ~8% coral. Never use red — red is punishment, and Inkprint is not punishment. Parchment, not pure white; pure white only for cards floating above the page.
+  </p>
+</section>
+
+<!-- ===== Slide 8 : TYPOGRAPHY ===== -->
+<section class="slide">
+  <div class="topbar">
+    <div class="logo">
+      <svg class="mark" viewBox="0 0 48 48"><g stroke="#1B2A4E" stroke-width="2" stroke-linecap="round" fill="none"><path d="M24 6 C14 6 8 14 8 24 C8 30 10 34 12 38"/><path d="M24 10 C16 10 12 17 12 24 C12 30 13.5 33 15 36"/><path d="M24 14 C18 14 16 19 16 24 C16 29 17 32 18 35"/><path d="M24 18 C20 18 20 22 20 24 C20 28 20 31 21 34"/><path d="M24 22 L24 33"/><path d="M28 18 C30 19 30 22 30 25 C30 29 29 31 28 33"/><path d="M32 14 C35 16 34 21 34 25 C34 30 33 33 32 35"/><path d="M36 10 C39 13 38 19 38 25 C38 30 37.5 33 36 36"/></g><circle cx="36" cy="40" r="2.5" fill="#E26D5A"/></svg>
+      <span class="word">Inkprint</span>
+    </div>
+    <span class="page-num">08 / 10</span>
+  </div>
+  <span class="eyebrow" style="color:var(--coral);">07 — Brand · Typography</span>
+  <h1 class="h1" style="margin-top:10px;">Newsreader for voice. Inter for clarity.</h1>
+
+  <div class="type-row">
+    <div class="label">Display · Newsreader 500</div>
+    <div class="specimen-display">See the <em>difference</em>.</div>
+  </div>
+  <div class="type-row">
+    <div class="label">H2 · Newsreader 500</div>
+    <div class="specimen-h2">Built for the classroom workflow.</div>
+  </div>
+  <div class="type-row">
+    <div class="label">Eyebrow · Inter 600</div>
+    <div class="specimen-eyebrow">Evidence, not verdicts</div>
+  </div>
+  <div class="type-row">
+    <div class="label">Body · Inter 400</div>
+    <div class="specimen-body">Inkprint reads how an essay was written and gives teachers a one-page evidence sheet — never a verdict.</div>
+  </div>
+  <div class="type-row">
+    <div class="label">Mono · JetBrains Mono</div>
+    <div class="specimen-mono">2.4σ · paste @ 14:32 · baseline 0.87</div>
+  </div>
+</section>
+
+<!-- ===== Slide 9 : WORKFLOW + PRICING ===== -->
+<section class="slide">
+  <div class="topbar">
+    <div class="logo">
+      <svg class="mark" viewBox="0 0 48 48"><g stroke="#1B2A4E" stroke-width="2" stroke-linecap="round" fill="none"><path d="M24 6 C14 6 8 14 8 24 C8 30 10 34 12 38"/><path d="M24 10 C16 10 12 17 12 24 C12 30 13.5 33 15 36"/><path d="M24 14 C18 14 16 19 16 24 C16 29 17 32 18 35"/><path d="M24 18 C20 18 20 22 20 24 C20 28 20 31 21 34"/><path d="M24 22 L24 33"/><path d="M28 18 C30 19 30 22 30 25 C30 29 29 31 28 33"/><path d="M32 14 C35 16 34 21 34 25 C34 30 33 33 32 35"/><path d="M36 10 C39 13 38 19 38 25 C38 30 37.5 33 36 36"/></g><circle cx="36" cy="40" r="2.5" fill="#E26D5A"/></svg>
+      <span class="word">Inkprint</span>
+    </div>
+    <span class="page-num">09 / 10</span>
+  </div>
+  <span class="eyebrow" style="color:var(--coral);">08 — Landing Page · Workflow &amp; Pricing</span>
+  <h1 class="h1" style="margin-top:10px;">Built for the workflow you already have.</h1>
+
+  <div class="card" style="margin-bottom:20px;">
+    <span class="eyebrow">LMS integrations · Phase 2</span>
+    <div class="chips">
+      <span class="chip">Canvas</span>
+      <span class="chip">Google Classroom</span>
+      <span class="chip">Moodle</span>
+      <span class="chip">Schoology</span>
+      <span class="chip">Bulk upload</span>
+      <span class="chip">PDF export</span>
+      <span class="chip">SSO · SAML</span>
+    </div>
+  </div>
+
+  <div class="three" style="margin-top:8px;">
+    <div class="price-card">
+      <h3>Free</h3>
+      <p class="body" style="margin:0; font-size:13px;">For individual teachers trying Inkprint.</p>
+      <div class="price">$0<small> / forever</small></div>
+      <ul>
+        <li>20 submissions / month</li>
+        <li>Single teacher</li>
+        <li>Web editor + Docs add-in</li>
+      </ul>
+    </div>
+    <div class="price-card feature">
+      <h3>Teacher Pro</h3>
+      <p style="margin:0; font-size:13px; opacity:.75;">For the teacher with 80 essays tonight.</p>
+      <div class="price">$12<small> / month</small></div>
+      <ul>
+        <li>Unlimited submissions</li>
+        <li>PDF evidence reports</li>
+        <li>Per-student baseline history</li>
+        <li>Priority support</li>
+      </ul>
+    </div>
+    <div class="price-card">
+      <h3>Institution</h3>
+      <p class="body" style="margin:0; font-size:13px;">For schools, districts, universities.</p>
+      <div class="price">Custom<small></small></div>
+      <ul>
+        <li>SSO + admin dashboard</li>
+        <li>FERPA DPA + EU residency</li>
+        <li>Custom retention policy</li>
+        <li>API + LMS integrations</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Slide 10 : CTA / CLOSE ===== -->
+<section class="slide ink-bg">
+  <div class="topbar">
+    <div class="logo">
+      <svg class="mark" viewBox="0 0 48 48"><g stroke="#F6F1E7" stroke-width="2" stroke-linecap="round" fill="none"><path d="M24 6 C14 6 8 14 8 24 C8 30 10 34 12 38"/><path d="M24 10 C16 10 12 17 12 24 C12 30 13.5 33 15 36"/><path d="M24 14 C18 14 16 19 16 24 C16 29 17 32 18 35"/><path d="M24 18 C20 18 20 22 20 24 C20 28 20 31 21 34"/><path d="M24 22 L24 33"/><path d="M28 18 C30 19 30 22 30 25 C30 29 29 31 28 33"/><path d="M32 14 C35 16 34 21 34 25 C34 30 33 33 32 35"/><path d="M36 10 C39 13 38 19 38 25 C38 30 37.5 33 36 36"/></g><circle cx="36" cy="40" r="2.5" fill="#E26D5A"/></svg>
+      <span class="word">Inkprint</span>
+    </div>
+    <span class="page-num" style="color:rgba(246,241,231,.6);">10 / 10</span>
+  </div>
+
+  <div style="flex:1; display:flex; flex-direction:column; justify-content:center; max-width:920px;">
+    <span class="eyebrow" style="color:var(--coral);">09 — Final CTA</span>
+    <h1 class="h-display" style="margin-top:18px;">
+      Evidence for the <em class="ital coral">AI era</em>.
+    </h1>
+    <p class="lead" style="margin-top:24px; max-width:720px;">
+      Inkprint is in closed pilot with 5–10 teachers. Public beta in Q3.
+      If you teach, run a department, or build the LMS — we'd love to show you the evidence panel.
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-primary">Start a free pilot →</a>
+      <a class="btn btn-secondary">Read the methodology</a>
+    </div>
+    <p style="margin-top:48px; font-family:var(--mono); font-size:11px; letter-spacing:.06em; color:rgba(246,241,231,.5);">
+      INKPRINT · DESIGN PRESENTATION · BUILT FROM PLAN.MD &amp; BRANDING.MD
+    </p>
+  </div>
+
+  <svg class="watermark" viewBox="0 0 48 48" style="position:absolute; right:-100px; bottom:-100px; width:560px; height:560px;">
+    <g stroke="#F6F1E7" stroke-width="1.2" stroke-linecap="round" fill="none">
+      <path d="M24 4 C13 4 6 13 6 24 C6 31 8 36 11 41"/>
+      <path d="M24 8 C15 8 10 16 10 24 C10 30 11.5 34 14 39"/>
+      <path d="M24 12 C17 12 14 18 14 24 C14 29 15 33 17 37"/>
+      <path d="M24 16 C19 16 18 20 18 24 C18 28 18 32 20 35"/>
+      <path d="M24 20 L24 33"/>
+      <path d="M28 16 C31 18 30 22 30 26 C30 30 29 33 28 35"/>
+      <path d="M32 12 C36 15 34 21 34 26 C34 31 33 34 31 37"/>
+      <path d="M36 8 C40 12 38 19 38 25 C38 31 37.5 34 35 39"/>
+      <path d="M40 4 C44 9 42 17 42 24 C42 31 41 36 38 41"/>
+    </g>
+  </svg>
+</section>
+
+</body>
+</html>
