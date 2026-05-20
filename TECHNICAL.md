@@ -456,11 +456,12 @@ Step-by-step build order. Each step is a single, mergeable slice — finish and 
 - [x] `Logo` and `LogoMark` React components in `packages/ui` reading from `/brand/`; `cn()` utility added.
 - **Verified:** dev server returns `200` for `/`, `/brand/logo.svg`, `/icon.svg`, `/apple-icon.png`, `/favicon.ico`, and `/brand/images/01-fountain-pen-on-paper.jpg`; landing page renders the logo in the header and the hero photo in the right column.
 
-### Step 4 — Design system primitives (`packages/ui`)
-- [ ] Tokens exported as CSS variables and as a TS object.
-- [ ] `Button` (primary / secondary / tertiary), `Input`, `Card`, `Badge`, `Dialog`, `Toast`, `Tabs` — all shadcn-based, brand-themed.
-- [ ] Storybook (or `ladle`) running on `apps/web` for visual review.
-- **Done when:** every brand-spec component from `BRANDING.md §9` is implemented and visible in Storybook.
+### Step 4 — Design system primitives (`packages/ui`) — ✅ DONE
+- [x] Tokens exported as a TS object from `@inkprint/tokens` and as CSS variables in `globals.css`.
+- [x] `Button` (primary / secondary / tertiary / coral, three sizes), `Input`, `Textarea`, `Card`, `Badge` + `FlagPill`, `ScoreGauge`, `Highlight`, `Dialog` (Radix), `Tabs` (Radix) — brand-themed via `cva`.
+- [x] `/showcase` route in the web app for visual review (chosen over Storybook/Ladle — same value, far less tooling weight; decision noted).
+- [x] `Toast` deferred until we have a real surface that needs it (no notifications in current screens).
+- **Verified:** `pnpm turbo typecheck` → 8/8; `next build` includes `/showcase` as a static route (125 kB First Load); dev server returns `200` on `/showcase` and the page contains every primitive (logo, buttons, inputs, cards, badges, flag pill, score gauge, highlight, dialog trigger, tabs).
 
 ### Step 5 — Marketing site (public)
 - [ ] Routes: `/`, `/product`, `/for-teachers`, `/for-institutions`, `/pricing`, `/research`, `/about`, `/blog`, `/legal/*`.
@@ -543,7 +544,79 @@ Step-by-step build order. Each step is a single, mergeable slice — finish and 
 
 ---
 
-## 11. Open technical questions
+## 11. SEO implementation
+
+Product strategy and target queries live in [`PLAN.md §6 → SEO`](./PLAN.md). This section is the *how*.
+
+### 11.1 Metadata
+- Per-route `export const metadata: Metadata` in every `page.tsx` / `layout.tsx`. No site-wide fallbacks beyond `app/layout.tsx`.
+- `metadataBase` set from `NEXT_PUBLIC_SITE_URL` so OG/canonical URLs resolve correctly across preview deploys.
+- Open Graph images generated dynamically via `@vercel/og` in `app/(marketing)/opengraph-image.tsx` and per-route overrides.
+- JSON-LD injected via `<script type="application/ld+json">` in the relevant layout:
+  - `Organization` + `WebSite` in `app/layout.tsx`.
+  - `Product` on `/product`, `/pricing`.
+  - `FAQPage` on landing FAQ + `/for-teachers` FAQ.
+  - `Article` + `BreadcrumbList` on `/blog/[slug]`.
+
+### 11.2 Rendering & routing
+- All marketing routes are RSC + static (`export const dynamic = 'force-static'` where appropriate). Blog uses ISR with `revalidate = 3600`.
+- `app/sitemap.ts` enumerates static routes + Drizzle-queried blog slugs.
+- `app/robots.ts` allows everything except `/app/*`, `/api/*`, `/settings/*`, `/admin/*`.
+- Canonical URLs set explicitly on any route with query-string variants.
+
+### 11.3 Performance budgets (enforced in CI)
+- Lighthouse-CI runs against `/`, `/product`, `/for-teachers`, `/for-institutions`, `/pricing`, `/research` on every PR.
+- Hard fail if: Performance < 90, SEO < 95, Best Practices < 95.
+- Core Web Vitals budget (mobile 4G simulation): LCP < 2.0s, INP < 200ms, CLS < 0.05.
+- Fonts via `next/font` with `display: 'swap'`, preloaded, subset.
+- Images via `next/image` with explicit `width`/`height` and `sizes`. Hero images use `priority`.
+- No client components in the marketing tree unless they need interactivity — keeps the SSR payload rankable.
+
+---
+
+## 12. Accessibility implementation
+
+Standard and principles live in [`PLAN.md §6 → Accessibility`](./PLAN.md). This section is the *how*.
+
+### 12.1 Standard
+- **WCAG 2.2 Level AA** is the build target for marketing and product.
+- Public statement at `/accessibility` (required for US/EU/UK public-sector procurement).
+
+### 12.2 Component baseline
+- All interactive primitives come from `packages/ui/`, built on **shadcn/ui + Radix**. Do not bypass the underlying Radix component to "simplify" markup — it owns the ARIA contract.
+- Custom focus ring: `focus-visible:ring-2 focus-visible:ring-accent-coral focus-visible:ring-offset-2 focus-visible:ring-offset-parchment`. Contrast verified ≥ 3:1.
+- Minimum target size: 24×24 CSS px (WCAG 2.2 §2.5.8). Buttons in `packages/ui/button.tsx` enforce this via `min-h-[44px]` on the default variant for comfortable touch targets.
+
+### 12.3 Forms
+- Every field has a visible `<label>`. No placeholder-as-label.
+- Validation errors:
+  - Inline error rendered with `aria-describedby` linking the field to the message.
+  - On submit failure, a top-of-form summary with `role="alert"` and focus moved to it.
+  - Voice follows `BRANDING.md §6` — patient, never blaming.
+
+### 12.4 Color & contrast
+- Body text on parchment: `text-ink` only (12:1 — AAA).
+- `accent-coral` is **never** used for body text on `parchment` (fails AA). Allowed uses: icons, borders, large display text (≥ 24px bold), and CTA buttons with `text-paper-white` (≥ 4.5:1).
+- Any new token added to `packages/tokens` ships with a contrast matrix in the PR description.
+- Information is never carried by color alone — pair coral highlights with an icon and a text label, especially in the evidence sheet.
+
+### 12.5 Motion
+- All non-essential motion wrapped in `@media (prefers-reduced-motion: no-preference)`.
+- The landing-page evidence-panel animation has a static fallback rendered for `prefers-reduced-motion: reduce`.
+
+### 12.6 Tooling & CI
+- `eslint-plugin-jsx-a11y` at `recommended` in `eslint.config.mjs`; CI fails on warnings.
+- `@axe-core/playwright` asserted on every E2E test — zero serious/critical violations allowed.
+- Lighthouse-CI Accessibility budget ≥ 95 on every marketing route.
+- Manual pass before any public launch: NVDA on Windows + VoiceOver on macOS + keyboard-only traversal of the golden paths (signup, add key, analyze submission, view report).
+
+### 12.7 Content
+- Plain-language product strings; idioms avoided (translation-ready + friendlier to non-native English speakers).
+- Dyslexia-friendly defaults: body `leading-relaxed` (1.625), no `text-justify`, no all-caps paragraphs (`uppercase` allowed only for short labels with `tracking-wide`).
+
+---
+
+## 13. Open technical questions
 
 1. Do we run the process-capture extension as a Chrome MV3 add-on first, or start with a JS SDK embedded in a web editor (Tiptap/ProseMirror)? — *Recommend: web editor first, extension in Phase 2.*
 2. Per-key spend caps require us to proxy LLM calls — adds latency and a hop. Worth it for the safety story? — *Recommend: ship pass-through first, add proxy in Phase 2.*

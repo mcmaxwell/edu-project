@@ -119,9 +119,9 @@ type StyleBaseline = {
   student_id: string
   language: string
   sample_count: number
-  sentence_length: { mean: number; sd: number; p10: number; p90: number }
+  // Statistical distributions are computed programmatically by the backend pipeline, not here.
   vocabulary: { ttr_band: 'low'|'mid'|'high'; notable_words: string[] }
-  syntactic_patterns: string[]    // human-readable
+  syntactic_patterns: string[]    
   discourse_markers: string[]
   punctuation_habits: string[]
   recurring_errors: string[]
@@ -171,7 +171,7 @@ Output strictly the SubmissionAnalysis JSON schema. No prose outside it.
 **Output schema:** `SubmissionAnalysis`
 
 ```ts
-type Span = { start: number; end: number; quote: string }
+type Span = { quote: string } 
 
 type FlaggedPassage = {
   span: Span
@@ -254,7 +254,7 @@ INPUT:
 | Provider | Model (default) | JSON mode | Caching | Notes |
 |---|---|---|---|---|
 | OpenAI | `gpt-4o-mini` | `response_format: json_schema` | Auto on system prompt | Use the schema, not free-form JSON. |
-| Anthropic | `claude-haiku-4-5` | Instructed | Explicit `cache_control: ephemeral` on system + baseline | Cheaper at scale; tool-use mode is an alternative to schema. |
+| Anthropic | `claude-3-5-haiku-latest ` | Instructed | Explicit `cache_control: ephemeral` on system + baseline | Cheaper at scale; tool-use mode is an alternative to schema. |
 | Gemini | `gemini-2.5-flash` | `responseSchema` + `responseMimeType: application/json` | N/A | Strong on structured output; cheapest token rate. |
 | Azure OpenAI | matches OpenAI | same | same | Institutional accounts only. |
 
