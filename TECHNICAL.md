@@ -463,12 +463,12 @@ Step-by-step build order. Each step is a single, mergeable slice — finish and 
 - [x] `Toast` deferred until we have a real surface that needs it (no notifications in current screens).
 - **Verified:** `pnpm turbo typecheck` → 8/8; `next build` includes `/showcase` as a static route (125 kB First Load); dev server returns `200` on `/showcase` and the page contains every primitive (logo, buttons, inputs, cards, badges, flag pill, score gauge, highlight, dialog trigger, tabs).
 
-### Step 5 — Marketing site (public)
-- [ ] Routes: `/`, `/product`, `/for-teachers`, `/for-institutions`, `/pricing`, `/research`, `/about`, `/blog`, `/legal/*`.
-- [ ] Landing-page sections from `PLAN.md §6` in priority order, using the hero imagery from `design/images/`.
-- [ ] MDX for `/blog` and `/legal`.
-- [ ] SEO: `<Metadata>` per route, sitemap, robots.txt, Open Graph image generated from the wordmark.
-- **Done when:** marketing site has full content stubs and deploys cleanly to a Vercel preview.
+### Step 5 — Marketing site (public) — ✅ DONE
+- [x] Routes: `/`, `/product`, `/for-teachers`, `/for-institutions`, `/pricing`, `/research`, `/about`, `/blog`, `/legal/privacy`, `/legal/terms`, `/legal/dpa`. All under a `(marketing)` route group with shared `SiteHeader` + `SiteFooter`.
+- [x] Landing-page sections from `PLAN.md §6` in priority order — hero, social proof, how-it-works, evidence panel demo, classroom workflow, privacy & ethics, pricing teaser, FAQ, final CTA — using the editorial photos from `design/images/`.
+- [x] Legal pages shipped as TSX with on-brand copy. **Decision:** deferred `@next/mdx` until real long-form content exists; not worth the extra dep for three legal pages.
+- [x] SEO: per-route `metadata`, `app/sitemap.ts`, `app/robots.ts`, `app/opengraph-image.tsx` (edge runtime, brand-themed).
+- **Verified:** `pnpm turbo typecheck --force` clean; `next build` produces 14 routes (11 marketing pages + `/sitemap.xml` + `/robots.txt` + `/opengraph-image`) all statically prerendered except the Edge-runtime OG image; dev server returns `200` on every marketing route, sitemap renders valid XML, shared header/footer visible across pages.
 
 ### Step 6 — Database & ORM
 - [ ] Provision Postgres (Neon dev branch).
