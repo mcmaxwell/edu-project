@@ -88,6 +88,36 @@ export async function revokeKeyForUser(userId: string, keyId: string): Promise<b
   return Boolean(r[0])
 }
 
+export async function getUsableKey(
+  userId: string,
+  provider: ProviderId,
+): Promise<{ plaintext: string } | null> {
+  const rows = await db
+    .select()
+    .from(schema.apiKeys)
+    .where(
+      and(
+        eq(schema.apiKeys.userId, userId),
+        eq(schema.apiKeys.provider, provider),
+        isNull(schema.apiKeys.revokedAt),
+      ),
+    )
+    .orderBy(desc(schema.apiKeys.createdAt))
+    .limit(1)
+  const row = rows[0]
+  if (!row) return null
+  const plaintext = decrypt({
+    ciphertext: Buffer.from(row.ciphertext),
+    iv: Buffer.from(row.iv),
+    authTag: Buffer.from(row.authTag),
+  })
+  await db
+    .update(schema.apiKeys)
+    .set({ lastUsedAt: new Date() })
+    .where(eq(schema.apiKeys.id, row.id))
+  return { plaintext }
+}
+
 export async function testKeyForUser(
   userId: string,
   keyId: string,

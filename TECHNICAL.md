@@ -510,12 +510,17 @@ Step-by-step build order. Each step is a single, mergeable slice — finish and 
 - [x] Middleware extended to gate `/settings/*`; onboarding step-2 "Add a key now" button now links to `/settings/keys` instead of being disabled.
 - **Verified end-to-end against Neon and the real OpenAI API:** invalid key rejected (HTTP 401 surfaced to the UI), real key validated against `api.openai.com/v1/models`, stored with `••••BckA` mask, re-test against provider succeeds, duplicate add rejected, revoke transitions status from `active` → `revoked`, **0 mentions of the plaintext key in the dev log** (grep-counted).
 
-### Step 10 — Analysis pipeline (text first)
-- [ ] File-parsing pipeline (txt, md, docx, pdf) — `TECHNICAL.md §1`.
-- [ ] Prompt loader from `packages/prompts/` with versioning.
-- [ ] `POST /api/submissions` accepts text or file → parses → runs `submission.text.v1` against the user's available provider (pooled grant or BYOK).
-- [ ] Stores `SubmissionAnalysis` row.
-- **Done when:** a teacher can paste an essay, get back a structured analysis, and see the flagged passages highlighted in the UI.
+### Step 10 — Analysis pipeline (text first) — ✅ DONE (prototype)
+- [x] `packages/prompts/src/index.ts` — `SYSTEM_PREAMBLE`, `SUBMISSION_ANALYSIS_SCHEMA` (strict JSON schema), `buildSubmissionUserMessage()`, and a `SubmissionAnalysis` type. Prompt version: `submission.text.v1`.
+- [x] `apps/web/server/llm.ts` — OpenAI Chat Completions call with `response_format: { type: 'json_schema', strict: true }`, 60s timeout, errors surface as `{ ok: false, reason }`.
+- [x] `apps/web/server/analyze.ts` — `analyzeAdHoc()` orchestrator: decrypts the user's OpenAI BYOK key via `getUsableKey()`, calls the LLM, then under `withUserScope()` looks up the class, finds-or-creates the student, inserts submission + analysis rows.
+- [x] `apps/web/server/keys.ts` — added `getUsableKey()` that returns the most recent active key + bumps `last_used_at`.
+- [x] `POST /api/analyze` — accepts pasted text or `.txt`/`.md` upload (≤1 MB, 20–12,000 chars), runs the pipeline, 303 to the result page.
+- [x] `/app/analyze` — paste + file form, CTA blocked when no key on file with link to `/settings/keys`.
+- [x] `/app/analyze/[id]` — verdict + confidence badges, the submission rendered with `<Highlight>` over flagged spans (substring match), per-passage cards with indicators, suggested conversation questions, caveats.
+- [x] `/showcase` gated behind `NODE_ENV !== 'production'` and removed from the sitemap — design system stays internal.
+- [ ] **Deferred:** `.docx`/`.pdf` parsing, Anthropic/Gemini in this surface (OpenAI only), chunking for >12k chars, baseline + process-trace conditioning.
+- **Verified end-to-end against OpenAI:** new user signs up → completes onboarding → adds an OpenAI key → posts an essay → 303 to `/app/analyze/<uuid>` → result page renders with verdict, flagged passages, conversation questions.
 
 ### Step 11 — Evidence sheet
 - [ ] `evidence.sheet.v1` prompt invoked on submission complete.

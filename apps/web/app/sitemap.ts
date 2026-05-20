@@ -14,7 +14,10 @@ const routes = [
   '/legal/privacy',
   '/legal/terms',
   '/legal/dpa',
-]
+] as const
+
+// `/showcase` is intentionally absent — it's the internal design-system review
+// surface and 404s in production.
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date()

@@ -41,6 +41,9 @@ importers:
       '@inkprint/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@inkprint/prompts':
+        specifier: workspace:*
+        version: link:../../packages/prompts
       '@inkprint/providers':
         specifier: workspace:*
         version: link:../../packages/providers

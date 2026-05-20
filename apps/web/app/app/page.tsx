@@ -56,15 +56,20 @@ export default async function DashboardPage() {
 
       <div className="rounded-md border border-sand bg-paper p-8">
         <h2 className="text-h3 font-display text-ink mb-3">
-          Analyze your first submission.
+          Analyze a submission.
         </h2>
         <p className="text-body text-slate mb-6 max-w-2xl">
-          Once your email is verified and an access grant or API key is on file, you&apos;ll be able
-          to drop in a student submission and see the evidence sheet. That flow lands in Step 10.
+          Paste a student&apos;s draft or upload a .txt / .md file. Inkprint flags passages worth a
+          closer look and returns an evidence sheet — never a verdict.
         </p>
-        <Link href="/showcase">
-          <Button variant="secondary">Browse the design system</Button>
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href="/app/analyze">
+            <Button>Start an analysis</Button>
+          </Link>
+          <Link href="/settings/keys">
+            <Button variant="secondary">Manage API keys</Button>
+          </Link>
+        </div>
       </div>
     </section>
   )

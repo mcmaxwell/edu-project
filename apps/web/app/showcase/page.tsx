@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation'
 import {
   Logo,
   LogoMark,
@@ -35,6 +36,7 @@ function Row({ title, children }: { title: string; children: React.ReactNode }) 
 }
 
 export default function ShowcasePage() {
+  if (process.env.NODE_ENV === 'production') notFound()
   return (
     <main className="max-w-5xl mx-auto px-6 py-12">
       <header className="mb-12">
