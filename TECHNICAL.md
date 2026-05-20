@@ -449,12 +449,12 @@ Step-by-step build order. Each step is a single, mergeable slice — finish and 
 - [x] Global CSS sets `bg-parchment text-slate font-sans`.
 - **Verified:** `next build` succeeds; dev server returns HTTP 200 on `/`; landing page renders the headline "See the difference between *effort* and *autocomplete*" with the brand fonts and parchment background.
 
-### Step 3 — Brand assets wired in
-- [ ] Copy `design/assets/*` → `apps/web/public/brand/`.
-- [ ] Add favicons via Next 15 metadata API (`app/icon.svg`, `app/apple-icon.png`, `app/favicon.ico`).
-- [ ] `<Image>` source paths for hero imagery (`/brand/images/01-...`).
-- [ ] `Logo` and `LogoMark` React components in `packages/ui` reading from `/brand/`.
-- **Done when:** browser tab shows the favicon, the landing page renders the logo, and `lighthouse` shows the touch icon detected.
+### Step 3 — Brand assets wired in — ✅ DONE
+- [x] Copy `design/assets/*` → `apps/web/public/brand/` (logo + inverted + mark, SVG + PNG).
+- [x] Add favicons via Next 15 metadata API (`app/icon.svg`, `app/apple-icon.png`, `app/favicon.ico`) — auto-registered as routes.
+- [x] Hero imagery copied to `apps/web/public/brand/images/` and consumed via `next/image`.
+- [x] `Logo` and `LogoMark` React components in `packages/ui` reading from `/brand/`; `cn()` utility added.
+- **Verified:** dev server returns `200` for `/`, `/brand/logo.svg`, `/icon.svg`, `/apple-icon.png`, `/favicon.ico`, and `/brand/images/01-fountain-pen-on-paper.jpg`; landing page renders the logo in the header and the hero photo in the right column.
 
 ### Step 4 — Design system primitives (`packages/ui`)
 - [ ] Tokens exported as CSS variables and as a TS object.

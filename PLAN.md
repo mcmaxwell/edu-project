@@ -155,6 +155,55 @@ Full inventory and per-asset usage rules live in `BRANDING.md §13`. These files
 8. **FAQ** — false positives, student rights, accuracy, comparison vs. other tools.
 9. **Final CTA.**
 
+### SEO
+
+Education buyers (teachers, integrity officers, procurement) start in search. Inkprint needs to rank for category-defining queries *and* the comparison queries that incumbents currently own.
+
+- **Target query clusters**
+  - Category: *"writing process detection,"* *"AI collaboration grading,"* *"keystroke evidence essay."*
+  - Comparison: *"Turnitin alternative,"* *"GPTZero false positives,"* *"AI detector for teachers."*
+  - Problem-led: *"how to tell if a student used ChatGPT,"* *"AI detector accuracy non-native English."*
+  - Compliance: *"FERPA AI detector,"* *"GDPR student data writing analysis."*
+- **On-page baseline (every route)**
+  - Unique `<title>` (≤60 chars) and `<meta name="description">` (≤155 chars), written per page — no templated stuffing.
+  - Open Graph + Twitter card tags with a per-page OG image generated via `@vercel/og`.
+  - JSON-LD: `Organization` + `WebSite` site-wide; `Product`, `FAQPage`, `Article` where applicable.
+  - Canonical URL set on every page; `/blog/*` posts have author + datePublished + dateModified.
+- **Technical SEO**
+  - Static generation (RSC) for all marketing routes; ISR for `/blog/*`.
+  - `sitemap.xml` and `robots.txt` generated at build (`app/sitemap.ts`, `app/robots.ts`).
+  - Lighthouse SEO ≥ 95 on every marketing route — gated in CI via Lighthouse-CI.
+  - Core Web Vitals budget: LCP < 2.0s, INP < 200ms, CLS < 0.05 (mobile 4G). Images via `next/image` with explicit dimensions; fonts via `next/font` to prevent CLS.
+  - No client-side-only marketing content — anything that should rank must be in the SSR'd HTML.
+- **Content engine (`/blog`, `/research`)**
+  - Pillar articles: methodology, accuracy reports, false-positive case studies, AI-collaboration rubrics.
+  - Internal linking from blog → product pages with descriptive anchor text.
+- **Off-page**
+  - `/research` is the link-magnet — publish open methodology and accuracy data; expect citations from EdTech press.
+
+### Accessibility
+
+Accessibility is not optional for an education product. Public schools in the US (Section 508), EU (EAA, in force June 2025), and UK (PSBAR) procure against accessibility standards, and many of our target users are themselves disabled or neurodivergent.
+
+- **Standard:** WCAG 2.2 Level **AA** is the floor for both marketing and product surfaces. AAA where it doesn't constrain the design (e.g., body copy contrast on `parchment`).
+- **Principles**
+  - Keyboard-operable end-to-end. Every interactive element reachable, focus visible (custom focus ring using `accent-coral` at ≥3:1 contrast), no keyboard traps.
+  - Screen-reader-first: semantic HTML, ARIA only where semantics fall short. shadcn/ui primitives (Radix under the hood) give us a correct baseline — don't strip the ARIA.
+  - Color is never the only signal. The evidence sheet uses icons + text labels alongside coral highlights — colorblind users get the same information.
+  - Motion respects `prefers-reduced-motion`; the "animated evidence panel" on the landing page has a static fallback.
+  - Form fields have visible labels (no placeholder-as-label), inline error text linked via `aria-describedby`, and submit errors are summarized at the top of the form.
+  - Target sizes ≥ 24×24 CSS px (WCAG 2.2 §2.5.8).
+- **Brand-specific contrast rules** (cross-reference `BRANDING.md §4`)
+  - `text-ink` (`#1B2A4E`) on `parchment` (`#F6F1E7`): contrast ≥ 12:1 ✓ for body.
+  - `accent-coral` (`#E26D5A`) must never be used for body text on `parchment` (fails AA). Restrict to icons, borders, large headings, and CTA buttons with white text.
+- **Process**
+  - `eslint-plugin-jsx-a11y` enforced in CI, `axe-core` run on every Playwright E2E route, manual NVDA + VoiceOver pass before any public launch.
+  - Lighthouse Accessibility ≥ 95 on every marketing route, gated in CI.
+  - Accessibility statement published at `/accessibility` with a contact route for issues; required for public-sector procurement.
+- **Inclusive content**
+  - Plain-language copy. Avoid idioms in product strings (translatable, and friendlier to non-native English speakers — the population most harmed by output-based detectors).
+  - Dyslexia-friendly defaults: generous line-height (1.6+ body), no justified text, no all-caps for paragraphs.
+
 ---
 
 ## 7. Roadmap (first 90 days)
