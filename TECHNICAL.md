@@ -429,7 +429,121 @@ All set per-environment in Vercel's dashboard; nothing secret in git. Categories
 
 ---
 
-## 10. Open technical questions
+## 10. Implementation steps
+
+Step-by-step build order. Each step is a single, mergeable slice — finish and verify it before starting the next. **Do not parallelize.** Tell the agent (or yourself) which step number you are on.
+
+### Step 1 — Repo & tooling
+- [ ] `pnpm init`, set `engines.node = "20.x"` and `packageManager`.
+- [ ] Initialize Turborepo with `apps/web` and `packages/{tokens,ui,types,providers,prompts}`.
+- [ ] Add `.editorconfig`, `.gitignore`, `.nvmrc`, `tsconfig.base.json` (strict mode on).
+- [ ] ESLint + Prettier + `cspell` configs at the repo root.
+- [ ] `pnpm install` clean, `pnpm turbo build` runs (even if empty).
+- **Done when:** `pnpm dev` boots an empty Next app at `localhost:3000`.
+
+### Step 2 — Next.js app skeleton
+- [ ] `apps/web` = Next 15 App Router + TypeScript strict.
+- [ ] Tailwind v3 + `tailwind.config.ts` importing brand tokens from `packages/tokens`.
+- [ ] shadcn/ui initialized with our brand colors mapped to its CSS variables.
+- [ ] Root layout, base font loading (`Newsreader`, `Inter`, `JetBrains Mono` via `next/font`).
+- [ ] Global CSS sets `bg-parchment text-slate font-sans`.
+- **Done when:** a "Hello Inkprint" page renders with correct fonts and the parchment background.
+
+### Step 3 — Brand assets wired in
+- [ ] Copy `design/assets/*` → `apps/web/public/brand/`.
+- [ ] Add favicons via Next 15 metadata API (`app/icon.svg`, `app/apple-icon.png`, `app/favicon.ico`).
+- [ ] `<Image>` source paths for hero imagery (`/brand/images/01-...`).
+- [ ] `Logo` and `LogoMark` React components in `packages/ui` reading from `/brand/`.
+- **Done when:** browser tab shows the favicon, the landing page renders the logo, and `lighthouse` shows the touch icon detected.
+
+### Step 4 — Design system primitives (`packages/ui`)
+- [ ] Tokens exported as CSS variables and as a TS object.
+- [ ] `Button` (primary / secondary / tertiary), `Input`, `Card`, `Badge`, `Dialog`, `Toast`, `Tabs` — all shadcn-based, brand-themed.
+- [ ] Storybook (or `ladle`) running on `apps/web` for visual review.
+- **Done when:** every brand-spec component from `BRANDING.md §9` is implemented and visible in Storybook.
+
+### Step 5 — Marketing site (public)
+- [ ] Routes: `/`, `/product`, `/for-teachers`, `/for-institutions`, `/pricing`, `/research`, `/about`, `/blog`, `/legal/*`.
+- [ ] Landing-page sections from `PLAN.md §6` in priority order, using the hero imagery from `design/images/`.
+- [ ] MDX for `/blog` and `/legal`.
+- [ ] SEO: `<Metadata>` per route, sitemap, robots.txt, Open Graph image generated from the wordmark.
+- **Done when:** marketing site has full content stubs and deploys cleanly to a Vercel preview.
+
+### Step 6 — Database & ORM
+- [ ] Provision Postgres (Neon dev branch).
+- [ ] Drizzle schema for `users`, `institutions`, `api_keys`, `access_grants`, `audit_events` (from `TECHNICAL.md §3`).
+- [ ] Migration scripts + first migration committed.
+- [ ] RLS policies in the migration.
+- [ ] `pnpm db:push` and `pnpm db:studio` work locally.
+- **Done when:** schema is applied to dev DB and an integration test inserts/reads a user under RLS.
+
+### Step 7 — Auth & registration
+- [ ] Lucia v3 wired with Postgres adapter.
+- [ ] `POST /api/auth/signup` (email + password, Argon2id, HIBP check).
+- [ ] `POST /api/auth/login`, `POST /api/auth/logout`.
+- [ ] Verification email via Resend.
+- [ ] `GET /api/auth/verify`, reset-password flow.
+- [ ] Middleware that gates `/app/*` and `/admin/*` by role.
+- **Done when:** a new user can sign up, verify, log in, log out, and see the empty dashboard.
+
+### Step 8 — Onboarding wizard
+- [ ] 3 steps from `TECHNICAL.md §4.1`: role pick → API key (skippable) → first class.
+- [ ] State persisted server-side, resumable.
+- **Done when:** the first-login flow drops the user at the dashboard with at least one class created.
+
+### Step 9 — BYOK (own API key)
+- [ ] KMS master key provisioned (AWS KMS via Vercel OIDC).
+- [ ] `packages/providers/{openai,anthropic,gemini,azure}.ts` adapters implementing `LlmProvider`.
+- [ ] `POST /api/keys`: validate against provider → encrypt with AES-256-GCM → store.
+- [ ] `GET /api/keys`, `POST /api/keys/:id/test`, `DELETE /api/keys/:id`.
+- [ ] `/settings/keys` UI matching the mockup in `TECHNICAL.md §5.3`.
+- **Done when:** a user can add an OpenAI key, see it validated, and revoke it; ciphertext is never logged.
+
+### Step 10 — Analysis pipeline (text first)
+- [ ] File-parsing pipeline (txt, md, docx, pdf) — `TECHNICAL.md §1`.
+- [ ] Prompt loader from `packages/prompts/` with versioning.
+- [ ] `POST /api/submissions` accepts text or file → parses → runs `submission.text.v1` against the user's available provider (pooled grant or BYOK).
+- [ ] Stores `SubmissionAnalysis` row.
+- **Done when:** a teacher can paste an essay, get back a structured analysis, and see the flagged passages highlighted in the UI.
+
+### Step 11 — Evidence sheet
+- [ ] `evidence.sheet.v1` prompt invoked on submission complete.
+- [ ] Markdown → React render in-app, print-ready PDF export via `react-pdf`.
+- **Done when:** the evidence sheet renders on screen and downloads as a one-page PDF.
+
+### Step 12 — Admin panel
+- [ ] `/admin/*` routes gated by `role IN ('admin','superadmin')`.
+- [ ] User list, user detail, grant-access dialog, audit log viewer.
+- [ ] `POST /api/admin/users/:id/grants` with the pooled-key flow from `TECHNICAL.md §6.2`.
+- [ ] Spend dashboard reading from the worker's token-count table.
+- **Done when:** an admin can grant a new user access to the pooled OpenAI key, see their token usage tick up, and revoke access.
+
+### Step 13 — Process capture (MVP, web editor)
+- [ ] Tiptap-based editor at `/app/write/:assignment_id`.
+- [ ] Captures keystrokes, paste events, focus changes, pauses → JSONL → POST to worker → gzipped in R2.
+- [ ] `process_traces` row with `summary_json` written on submit.
+- [ ] Submission UI shows trace summary alongside the LLM analysis.
+- **Done when:** a draft written in the in-app editor produces a real trace that visibly influences the analysis verdict.
+
+### Step 14 — Deployment hardening
+- [ ] Vercel projects for US and EU regions.
+- [ ] Environment variables set per `TECHNICAL.md §9.3`.
+- [ ] Cron job (Vercel) for monthly token-counter reset.
+- [ ] PostHog + Sentry instrumented.
+- [ ] Playwright E2E covering: signup, BYOK add, analyze text, admin grant.
+- **Done when:** all E2E tests pass against the staging Vercel deployment.
+
+### Step 15 — Closed pilot
+- [ ] 5–10 teachers onboarded manually.
+- [ ] Feedback loop: weekly survey + PostHog session replays + a `/feedback` route inside the app.
+- [ ] Track false-positive rate against a hand-labeled gold set.
+- **Done when:** there is real teacher usage on the platform and a written postmortem of what to fix before public beta.
+
+> **Working agreement:** at each step, the agent reports "starting Step N," does the work, then reports "Step N done, here is what changed." No skipping steps. No bundling. If a step is too large, split it in this list before starting.
+
+---
+
+## 11. Open technical questions
 
 1. Do we run the process-capture extension as a Chrome MV3 add-on first, or start with a JS SDK embedded in a web editor (Tiptap/ProseMirror)? — *Recommend: web editor first, extension in Phase 2.*
 2. Per-key spend caps require us to proxy LLM calls — adds latency and a hop. Worth it for the safety story? — *Recommend: ship pass-through first, add proxy in Phase 2.*

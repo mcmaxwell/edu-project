@@ -115,6 +115,13 @@ Stylized fingerprint where the ridge lines resolve into ink strokes. Wordmark se
 **Mood & imagery**
 Annotated essays, margins with handwritten notes, microscope-on-text close-ups. Quiet authority. **Avoid:** robots, neural-net diagrams, glowing-blue AI clichés, red "alert" UI (too punitive).
 
+**Assets (already produced)**
+Brand assets are committed under `/design/`:
+- `design/assets/` — logo (primary + inverted + mark, SVG + PNG), favicons (SVG + ICO + 16/32 PNG), Apple touch icon.
+- `design/images/` — six editorial photographs (pen on paper, annotated books, dictionary close-up) for marketing surfaces.
+
+Full inventory and per-asset usage rules live in `BRANDING.md §13`. These files are the source of truth — implementation copies from `/design/` into `apps/web/public/`, never the other way around.
+
 ---
 
 ## 6. Website plan

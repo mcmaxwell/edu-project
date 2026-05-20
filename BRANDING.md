@@ -331,3 +331,49 @@ CSS variables, Tailwind config, and Figma styles all use the same names. One sou
 
 ### Exceptions
 *None.*
+
+---
+
+## 13. Asset inventory
+
+All brand assets live in `/design/`. This is the **source of truth** — copy from here into `apps/web/public/` during implementation, do not maintain duplicates elsewhere.
+
+### 13.1 Logo & marks (`design/assets/`)
+
+| File | Use |
+|---|---|
+| `logo.svg` | Primary lockup (mark + wordmark), Ink Blue on Parchment. Vector — use everywhere possible. |
+| `logo.png` | Raster fallback of the primary lockup. For email and slide decks. |
+| `logo-inverted.svg` | Inverted lockup, Parchment on Ink Blue. For dark hero sections, social avatars. |
+| `logo-inverted.png` | Raster fallback of the inverted lockup. |
+| `logo-mark.svg` | Mark only (no wordmark). For app icons, watermarks, small contexts. |
+| `logo-mark.png` | Raster fallback of the mark. |
+
+### 13.2 Favicons (`design/assets/`)
+
+| File | Size | Use |
+|---|---|---|
+| `favicon.svg` | vector | Modern browsers (preferred). |
+| `favicon.ico` | 16/32/48 multi | Legacy browser fallback. |
+| `favicon-16.png` | 16×16 | Explicit small size. |
+| `favicon-32.png` | 32×32 | Explicit standard size. |
+| `apple-touch-icon.png` | 180×180 | iOS home-screen icon. |
+
+### 13.3 Hero / marketing imagery (`design/images/`)
+
+| File | Subject | Use |
+|---|---|---|
+| `01-fountain-pen-on-paper.jpg` | Fountain pen on paper | Hero or "Authorship" section. |
+| `02-open-book-handwritten-notes.jpg` | Open book with handwritten annotations | "Evidence panel" intro, blog. |
+| `03-dictionary-close-up.jpg` | Dictionary text close-up | "Methodology / Research" page. |
+| `04-book-margin-notes.jpg` | Book margins with notes | "How it works" supporting image. |
+| `05-open-book-on-table.jpg` | Calm open book on a table | About page, testimonial section. |
+| `06-open-book-text.jpg` | Open book, text-forward | Generic editorial fill. |
+
+All images align with §7.1 — annotated paper, warm light, no robots or glowing-blue tech. Re-encode to AVIF + WebP at build time via Next.js `<Image>`; serve JPEG as final fallback only.
+
+### 13.4 Naming rules for future assets
+- Marks: `logo[-variant].svg|png`.
+- Favicons: `favicon[-size].png|svg|ico`.
+- Images: `NN-kebab-case-description.jpg` where `NN` is a stable two-digit prefix for ordering.
+- Never include "draft," "final," "v2," or dates in asset filenames — version through git.
