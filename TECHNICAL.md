@@ -433,21 +433,21 @@ All set per-environment in Vercel's dashboard; nothing secret in git. Categories
 
 Step-by-step build order. Each step is a single, mergeable slice — finish and verify it before starting the next. **Do not parallelize.** Tell the agent (or yourself) which step number you are on.
 
-### Step 1 — Repo & tooling
-- [ ] `pnpm init`, set `engines.node = "20.x"` and `packageManager`.
-- [ ] Initialize Turborepo with `apps/web` and `packages/{tokens,ui,types,providers,prompts}`.
-- [ ] Add `.editorconfig`, `.gitignore`, `.nvmrc`, `tsconfig.base.json` (strict mode on).
-- [ ] ESLint + Prettier + `cspell` configs at the repo root.
-- [ ] `pnpm install` clean, `pnpm turbo build` runs (even if empty).
-- **Done when:** `pnpm dev` boots an empty Next app at `localhost:3000`.
+### Step 1 — Repo & tooling — ✅ DONE
+- [x] `pnpm init`, set `engines.node = "20.x"` and `packageManager`.
+- [x] Initialize Turborepo with `apps/web` and `packages/{tokens,ui,types,providers,prompts}`.
+- [x] Add `.editorconfig`, `.gitignore`, `.nvmrc`, `tsconfig.base.json` (strict mode on).
+- [x] ESLint + Prettier + `cspell` configs at the repo root.
+- [x] `pnpm install` clean, `pnpm turbo build` runs (even if empty).
+- **Verified:** `pnpm install` → 212 packages; `pnpm turbo build` → 6/6 successful; `pnpm turbo typecheck` → 6/6 successful.
 
-### Step 2 — Next.js app skeleton
-- [ ] `apps/web` = Next 15 App Router + TypeScript strict.
-- [ ] Tailwind v3 + `tailwind.config.ts` importing brand tokens from `packages/tokens`.
-- [ ] shadcn/ui initialized with our brand colors mapped to its CSS variables.
-- [ ] Root layout, base font loading (`Newsreader`, `Inter`, `JetBrains Mono` via `next/font`).
-- [ ] Global CSS sets `bg-parchment text-slate font-sans`.
-- **Done when:** a "Hello Inkprint" page renders with correct fonts and the parchment background.
+### Step 2 — Next.js app skeleton — ✅ DONE
+- [x] `apps/web` = Next 15 App Router + TypeScript strict.
+- [x] Tailwind v3 + `tailwind.config.ts` importing brand tokens from `packages/tokens`.
+- [x] Brand colors mapped to Tailwind theme + CSS variables (shadcn primitives land in Step 4).
+- [x] Root layout, base font loading (`Newsreader`, `Inter`, `JetBrains Mono` via `next/font`).
+- [x] Global CSS sets `bg-parchment text-slate font-sans`.
+- **Verified:** `next build` succeeds; dev server returns HTTP 200 on `/`; landing page renders the headline "See the difference between *effort* and *autocomplete*" with the brand fonts and parchment background.
 
 ### Step 3 — Brand assets wired in
 - [ ] Copy `design/assets/*` → `apps/web/public/brand/`.
@@ -539,7 +539,7 @@ Step-by-step build order. Each step is a single, mergeable slice — finish and 
 - [ ] Track false-positive rate against a hand-labeled gold set.
 - **Done when:** there is real teacher usage on the platform and a written postmortem of what to fix before public beta.
 
-> **Working agreement:** at each step, the agent reports "starting Step N," does the work, then reports "Step N done, here is what changed." No skipping steps. No bundling. If a step is too large, split it in this list before starting.
+> **Working agreement:** at each step, the agent reports "starting Step N," does the work, then reports "Step N done, here is what changed." No skipping steps. No bundling. **After every step, mark it ✅ DONE in this list with a one-line "Verified:" summary of the check that confirmed it.** If a step is too large, split it in this list before starting.
 
 ---
 

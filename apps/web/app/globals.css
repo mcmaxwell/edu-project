@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-ink: 27 42 78;
+    --color-parchment: 246 241 231;
+    --color-coral: 226 109 90;
+    --color-slate: 107 114 128;
+    --color-paper: 255 255 255;
+    --color-sand: 234 223 198;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-parchment text-slate font-sans;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display text-ink;
+    font-weight: 500;
+  }
+
+  ::selection {
+    background-color: rgb(247 201 192);
+    color: rgb(27 42 78);
+  }
+}
